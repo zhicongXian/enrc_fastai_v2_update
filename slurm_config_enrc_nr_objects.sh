@@ -21,5 +21,5 @@ export LAPACK=/usr/lib/x86_64-linux-gnu/lapack/liblapack.a
 # pip install -U pip setuptools wheel
 # train
 # --TODO do not forget to install
-python3 ./cluster_nrobjects_new.py --dataset-path=data/datasets/enrc_data/nr_objects  >> ./outputs/enrc_nr_objects_out.txt
+python3 ./cluster_nrobjects_new.py --dataset-path=/home/wiss/xian/Python_code/interpretable_multiple_clusterings/interpretable_multiple_clusterings/data/datasets/enrc_data/nr_objects  >> ./outputs/enrc_nr_objects_out.txt
 
