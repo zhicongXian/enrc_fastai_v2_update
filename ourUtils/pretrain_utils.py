@@ -4,6 +4,7 @@ import random
 
 
 def random_seed(seed_value, use_cuda=True):
+    seed_value = int(seed_value)  # Convert NumPy integer to Python int
     np.random.seed(seed_value)
     torch.manual_seed(seed_value)
     random.seed(seed_value)
