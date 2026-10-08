@@ -67,7 +67,7 @@ def pretrain(np_seeds=None, nr_aes = 10, src_path = r"C:\Users\erikc\Documents\D
         splitter=IndexSplitter([]),  # Equivalent to split_none(), whether to create validation data
         get_y=lambda x: x,  # Each image is its own target
     )
-    bs = len(files)
+    bs = 64 #len(files)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
