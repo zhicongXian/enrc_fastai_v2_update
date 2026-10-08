@@ -75,7 +75,7 @@ def load_model(model_dir, clevr_dir, nfs, embd_sz, seed):
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset-path", type=Path, default = r"C:\Users\erikc\Documents\Data\enrc_data\enrc_data\nr_objects\tmp")
-
+    parser.add_argument("--nr_aes", type=int, default=10)
     def parse_list(value):
         try:
             parsed = json.loads(value)
@@ -95,7 +95,7 @@ def main(np_seeds=None):
     args = parse_args()
     clevr_dir = args.dataset_path
     np_seeds = np.asarray(args.seeds)
-    nr_aes = 10  # 10 --TODO
+    nr_aes = args.nr_aes  # 10 --TODO
     pretrain(np_seeds, nr_aes, clevr_dir)
     CONCAT_LABELS = True
 
@@ -107,7 +107,7 @@ def main(np_seeds=None):
                 f"passed seeds {np_seeds.shape[0]} are smaller than number of aes {nr_aes}")
 
     bs = 64
-    n_iterations = 20000 #20000 --TODO
+    n_iterations = 20000 #20000 #20000 --TODO
     cluster_lr = 1e-2
     pretrain_lr = cluster_lr / 4.0  # initial lr 1e-2/4.0
     # noop returns its argument unchanged, equivalent to lambda x: x
@@ -117,7 +117,7 @@ def main(np_seeds=None):
     std = (0.1263, 0.1241, 0.1253)
     mean = (0.4490, 0.4362, 0.4286)
 
-    nr_of_images = 10000 #63# 10000 --TODO
+    nr_of_images = 10000 #10000 #63# 10000 --TODO
 
     result_dir = os.path.join("enrc_results", "nr_objects")
     setup_directory(result_dir)
@@ -171,7 +171,7 @@ def main(np_seeds=None):
 
                 # model_dir = os.path.join(
                 #     clevr_dir, "images", "train", "models", model_name)
-                model_dir = os.path.join("models", model_name)#"./models"
+                model_dir = os.path.join("./enrc_results/nr_objects","models", model_name)#"./models"
 
                 ae_model = load_model(model_dir, clevr_dir,
                                       nfs, embd_sz, seed=np_seeds[ae_index])

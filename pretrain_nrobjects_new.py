@@ -11,7 +11,7 @@ import numpy as np
 from fastai.layers import ConvLayer, ResBlock
 from fastai.vision.all import *
 
-def pretrain(np_seeds=None, nr_aes = 10,src_path = r"C:\Users\erikc\Documents\Data\enrc_data\enrc_data\nr_objects\tmp\images\train"):
+def pretrain(np_seeds=None, nr_aes = 10, src_path = r"C:\Users\erikc\Documents\Data\enrc_data\enrc_data\nr_objects\tmp\images\train"):
     # nr_aes = 2#10 --TODO
     if np_seeds is None:
         np_seeds = np.random.randint(100000, size=nr_aes)
@@ -23,8 +23,8 @@ def pretrain(np_seeds=None, nr_aes = 10,src_path = r"C:\Users\erikc\Documents\Da
 
     # L2 regularization
     wd = 1e-3
-    finetune_iterations =  5000 # 200 #5000 --TODO
-    epochs = 72  # approx. 10000 iterations with bs of 64
+    finetune_iterations = 5000 # 200 #5000 --TODO
+    epochs = 72 # 72  # approx. 10000 iterations with bs of 64 # --TODO
     max_lr = 1e-2
     tie_weights = False
 
@@ -129,7 +129,7 @@ def pretrain(np_seeds=None, nr_aes = 10,src_path = r"C:\Users\erikc\Documents\Da
                                               dropout_ae=dropout_rate,
                                               )
 
-            learn = Learner(data, ae_model, loss_func=my_loss, wd=wd)
+            learn = Learner(data, ae_model, loss_func=my_loss, wd=wd, path= "./enrc_results/nr_objects", )
             print("Base directory:", learn.path)
             print("Model directory:", learn.model_dir)
             learn.fit_one_cycle(epochs, lr_max=max_lr, wd=wd)
