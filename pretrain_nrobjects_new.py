@@ -68,22 +68,67 @@ def pretrain(np_seeds=None, nr_aes = 10, src_path = r"C:\Users\erikc\Documents\D
         get_y=lambda x: x,  # Each image is its own target
     )
     bs = len(files)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+    @torch.no_grad()
+    def channel_stats(dl):
+        """Streaming per-channel statistics for batches shaped [B, C, H, W]."""
+        count = 0
+        mean = None
+        m2 = None  # Sum of squared deviations from the running mean
+
+        for xb, *_ in dl:
+            # Float64 improves numerical accuracy; only one batch is converted.
+            x = xb.to(device=device, dtype=torch.float64)
+
+            n = x.shape[0] * x.shape[2] * x.shape[3]
+            batch_var, batch_mean = torch.var_mean(
+                x, dim=(0, 2, 3), correction=0
+            )
+            batch_m2 = batch_var * n
+
+            if mean is None:
+                mean = batch_mean
+                m2 = batch_m2
+                count = n
+            else:
+                total = count + n
+                delta = batch_mean - mean
+
+                m2 = m2 + batch_m2 + delta.square() * (count * n / total)
+                mean = mean + delta * (n / total)
+                count = total
+
+        if count <= 1:
+            raise ValueError("At least two pixels per channel are required.")
+
+        # Matches your original std(..., unbiased=True).
+        std = (m2 / (count - 1)).clamp_min(0).sqrt()
+
+        # Avoid division by zero for a constant channel.
+        std = torch.where(std == 0, torch.ones_like(std), std)
+
+        return [mean.float(), std.float()]
+
+    stats_bs = 64  # Reduce this further if RAM is limited
     dls = src.dataloaders(
         files,
-        bs=len(files),
-        device=torch.device("cpu"),
+        bs=stats_bs,
+        device=device,
+        # device=torch.device("cpu"),
         num_workers=0,
         shuffle=False,
         drop_last=False,
     )
-
-    xb, yb = dls.train.one_batch()
-
-    # Equivalent to v1 batch_stats(): per-channel mean and standard deviation
-    stats = [
-        xb.mean(dim=(0, 2, 3)),
-        xb.std(dim=(0, 2, 3), unbiased=True),
-    ] # define the initial normalization
+    stats = channel_stats(dls.train)
+    # xb, yb = dls.train.one_batch()
+    #
+    # # Equivalent to v1 batch_stats(): per-channel mean and standard deviation
+    # stats = [
+    #     xb.mean(dim=(0, 2, 3)),
+    #     xb.std(dim=(0, 2, 3), unbiased=True),
+    # ] # define the initial normalization
 
     for hl in [16]:
         embd_sz = hl
