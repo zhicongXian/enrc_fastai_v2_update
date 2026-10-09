@@ -30,11 +30,16 @@ def init_model(embd_sz, nfs, gtsrb_dir, random_state):
         else:
             return [ConvLayer(ni, nf, stride=stride, ks=2, padding= 0, transpose=True), nn.Dropout2d(p=dropout_rate), ResBlock(1, nf, nf, act_cls=partial(nn.LeakyReLU, negative_slope=slope))]
 
+    ########## fastai v1 #########
+    # src = (ImageImageList.from_folder(path=gtsrb_dir)
+    #        .split_by_rand_pct(valid_pct=0.2, seed=random_state)
+    #        .label_from_func(func=lambda x: x))
+    ##############
 
     block = DataBlock(
         blocks=(ImageBlock, ImageBlock),
         get_items=get_image_files,
-        splitter=RandomSplitter(valid_pct=0.1, seed=random_state),
+        splitter=RandomSplitter(valid_pct=0.2, seed=random_state),
         get_y=noop,  # Return the same image path as the target
         batch_tfms=Normalize(),
     )
@@ -65,7 +70,7 @@ class CustomImageFolder(datasets.folder.DatasetFolder):
 def load_model(model_dir, gtsrb_dir, nfs, embd_sz, seed):
     ae_model = init_model(embd_sz, nfs, gtsrb_dir,
                           random_state=seed)
-    ae_dict = torch.load(os.path.join(model_dir))
+    ae_dict = torch.load(os.path.join(model_dir), weights_only=False)
     ae_state_dict = ae_dict["model"]
     ae_model.load_state_dict(ae_state_dict, strict=True)
     return ae_model
@@ -117,7 +122,8 @@ def get_pt_data(dl):
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset-path", type=Path, default = r"C:\Users\erikc\Documents\Data\enrc_data\enrc_data\nr_objects\tmp")
+    parser.add_argument("--dataset-path", type=Path, default = r"C:\Users\erikc\Documents\Data\enrc_data\enrc_data\gtsrb")
+    parser.add_argument("--nr_aes", type=int, default=10)
 
     def parse_list(value):
         try:
@@ -135,7 +141,11 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 def main(np_seeds=None):
-    nr_aes = 10
+    args = parse_args()
+    gtsrb_image_dir = args.dataset_path
+    np_seeds = np.asarray(args.seeds)
+    nr_aes = args.nr_aes  # 10 --TODO
+    pretrain(np_seeds, nr_aes, gtsrb_image_dir)
     if np_seeds is None:
         np_seeds = np.random.randint(100000, size=nr_aes)
     else:
@@ -144,13 +154,13 @@ def main(np_seeds=None):
                 f"passed seeds {np_seeds.shape[0]} are smaller than number of aes {nr_aes}")
 
     bs = 64
-    n_iterations = 20000
+    n_iterations = 20000 #  100 #20000 # --TODO
     cluster_lr = 1e-2
     pretrain_lr = cluster_lr / 4.0  # initial lr 1e-2/4.0
 
     # Dataset statistics
-    gtsrb_dir = os.path.join('data', 'gtsrb')
-    gtsrb_image_dir = os.path.join('data', 'gtsrb', 'train')
+    gtsrb_dir = args.dataset_path # #os.path.join('data', 'gtsrb') # model directory
+    # gtsrb_image_dir = os.path.join('data', 'gtsrb', 'train')
 
     result_dir = os.path.join("enrc_results", "gtsrb")
     setup_directory(result_dir)
@@ -191,7 +201,8 @@ def main(np_seeds=None):
                                                       drop_last=True)
 
             model_dir = os.path.join(
-                gtsrb_dir, f"models/{model_name}")
+                "./enrc_results/gtsrb", f"models/{model_name}")
+
 
             ae_model = load_model(model_dir, gtsrb_dir,
                                   nfs, embd_sz, seed=np_seeds[ae_index])
@@ -228,5 +239,5 @@ def main(np_seeds=None):
 if __name__ == "__main__":
     nr_aes = 10
     np_seeds = np.random.randint(100000, size=nr_aes)
-    pretrain(np_seeds)
+    # pretrain(np_seeds)
     main(np_seeds)
