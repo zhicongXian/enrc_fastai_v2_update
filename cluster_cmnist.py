@@ -107,7 +107,7 @@ def parse_args() -> argparse.Namespace:
 
         return parsed
 
-    parser.add_argument('-s', '--seeds', type=parse_list, help='here you can set a list of seeds', default=[1, 2, 3,4,5,6,7,8,9,10])
+    parser.add_argument('-s', '--seeds', type=parse_list, help='here you can set a list of seeds', default=[1,2,3,4,5,6,7,8,9,10])
     # Use like:
     return parser.parse_args()
 
@@ -167,7 +167,7 @@ def main(np_seeds=None):
         for ae_index in range(nr_aes):
             print("\nStart training ae {} with random seed {}".format(
                 ae_index, np_seeds[ae_index]))
-            random_seed(np_seeds[ae_index])
+            random_seed(int(np_seeds[ae_index] ))
             model_name = f"ae-model-hl-{embd_sz}-idx-{ae_index}.pth"
 
             trainloader = torch.utils.data.DataLoader(trainset, batch_size=bs,
