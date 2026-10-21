@@ -87,7 +87,7 @@ def parse_args() -> argparse.Namespace:
 
         return parsed
 
-    parser.add_argument('-s', '--seeds', type=parse_list, help='here you can set a list of seeds', default=[1, 2, 3,4,5,6,7,8,9,10])
+    parser.add_argument('-s', '--seeds', type=parse_list, help='here you can set a list of seeds', default=[1,2,3,4,5,6,7,8,9,10])
     # Use like:
     return parser.parse_args()
 
@@ -161,7 +161,7 @@ def main(np_seeds=None):
                     ae_index, np_seeds[ae_index]))
 
                 np_seeds[ae_index] += try_i
-                random_seed(np_seeds[ae_index])
+                random_seed(int(np_seeds[ae_index]))
                 model_name = f"ae-model-hl-{embd_sz}-idx-{ae_index}.pth"
 
                 trainloader = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(*(pt_data, torch.from_numpy(pt_labels))),

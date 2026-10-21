@@ -136,7 +136,7 @@ def parse_args() -> argparse.Namespace:
 
         return parsed
 
-    parser.add_argument('-s', '--seeds', type=parse_list, help='here you can set a list of seeds', default=[1, 2, 3,4,5,6,7,8,9,10])
+    parser.add_argument('-s', '--seeds', type=parse_list, help='here you can set a list of seeds', default=[1,2,3,4,5,6,7,8,9,10])
     # Use like:
     return parser.parse_args()
 

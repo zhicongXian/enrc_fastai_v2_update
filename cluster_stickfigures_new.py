@@ -47,7 +47,12 @@ def init_model(embd_sz, nfs, data_dir, random_state):
         ),
     )
 
-    data = src.databunch(bs=16)
+    src = data_block.datasets(data_dir)
+
+    # Randomly assign approximately 90% to training and 10% to validation. A fixed seed makes the split reproducible for the same ordered file list.
+
+    # bs doesn't matter only shape is important
+    data = data_block.dataloaders(data_dir, bs=16, num_workers=0, drop_last=False)
     ae_model = CNNAutoencoderFlexible(data=data,
                                       nfs=nfs,
                                       layer_enc=conv_and_res,
