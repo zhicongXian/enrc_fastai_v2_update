@@ -1,10 +1,10 @@
 import os
-from ourUtils.torch_utils_utils.aes.conv_ae import CNNAutoencoderFlexible
+from ourUtils.torch_utils.aes.conv_ae import CNNAutoencoderFlexible
 from fastai.vision import conv_layer, res_block, conv2d_trans
 import torch.utils.data
 from torch import nn
 import torchvision.transforms as transforms
-from ourUtils.torch_utils_utils import clevr_data
+from ourUtils.torch_utils import clevr_data
 from ourUtils.funct_band_aids import setup_directory
 import numpy as np
 from copy import deepcopy
