@@ -162,7 +162,7 @@ def main(np_seeds=None):
 
                 np_seeds[ae_index] += try_i
                 random_seed(int(np_seeds[ae_index]))
-                model_name = f"ae-model-hl-{embd_sz}-idx-{ae_index}.pth"
+                model_name = f"ae-model-hl-{embd_sz}-idx-{ae_index}-seed{np_seeds[ae_index]}.pth"
 
                 trainloader = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(*(pt_data, torch.from_numpy(pt_labels))),
                                                           batch_size=bs,

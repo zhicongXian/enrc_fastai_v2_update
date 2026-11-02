@@ -1,6 +1,6 @@
 import pandas as pd
 
-result_folder = "./enrc_results/nr_objects"
+result_folder = "./enrc_results/cmnist"
 import numpy as np
 
 import csv
@@ -13,6 +13,12 @@ def best_nmi_mapping(
     perspectives=( "color","material", "shape"),
     transpose=False,
 ):
+    if "nr_objects" in str(csv_path):
+        perspectives = ("color", "material", "shape")
+    elif "gtsrb" in str(csv_path):
+        perspectives = ("type", "color")
+    elif "cmnist" in str(csv_path):
+        perspectives = ("left", "right")
     with open(csv_path, newline="", encoding="utf-8-sig") as f:
         reader = csv.reader(f, delimiter=";")
         headers = next(reader)  # Column names: 0;1;2
